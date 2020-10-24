@@ -14,6 +14,9 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import FontFaceObserver from 'fontfaceobserver';
+import { Web3ReactProvider } from '@web3-react/core';
+import Web3WsProvider from 'web3-providers-ws';
+import Web3 from 'web3';
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
 
@@ -46,12 +49,18 @@ const initialState = {};
 const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
 
+function getLibrary(provider) {
+  return new Web3(new Web3WsProvider(provider.url, { timeout: 30000 }));
+}
+
 const render = messages => {
   ReactDOM.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
-          <App />
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <App />
+          </Web3ReactProvider>
         </ConnectedRouter>
       </LanguageProvider>
     </Provider>,
